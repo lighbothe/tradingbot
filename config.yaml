@@ -1,7 +1,7 @@
 exchange:
   id: bybit
-  api_key: "YOUR_API_KEY"
-  secret: "YOUR_SECRET"
+  api_key: "L8dt5ojVs41uZyEMsC"
+  secret: "RtQXOqshU806ClnBvmXUNHVQsxLHBbtQsO7R"
   testnet: true
   testnet_url: "https://api-testnet.bybit.com"
   mainnet_url: "https://api.bybit.com"
