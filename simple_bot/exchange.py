@@ -51,31 +51,55 @@ class Exchange:
         df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
         return df
 
-    def open_position(self, side: str, size: float, sl: float, tp: float) -> None:
-        """Place market order with SL/TP."""
+    def open_position(self, side: str, size: float, sl: float, tp: float) -> Dict[str, Any]:
+        """Place market order with optional SL/TP.
+
+        Returns a dictionary with the created order objects.
+        """
         params = {
             "time_in_force": "GoodTillCancel",
             "reduce_only": False,
             "close_on_trigger": False,
             "category": "linear",
         }
-        self.client.create_market_order(self.symbol, side, size, params=params)
+        entry = self.client.create_order(self.symbol, "market", side, size, params=params)
+
+        opposite = "sell" if side == "buy" else "buy"
+        sl_order = None
         if sl:
-            self.client.create_order(
+            sl_order = self.client.create_order(
                 self.symbol,
-                "STOP",
-                side="sell" if side == "buy" else "buy",
+                "market",
+                side=opposite,
                 amount=size,
-                params={"stop_price": sl, "category": "linear"},
+                params={
+                    "triggerPrice": sl,
+                    "stopLoss": {"triggerPrice": sl},
+                    "tpSlMode": "Full",
+                    "reduceOnly": True,
+                    "closeOnTrigger": True,
+                    "category": "linear",
+                },
             )
+
+        tp_order = None
         if tp:
-            self.client.create_order(
+            tp_order = self.client.create_order(
                 self.symbol,
-                "TAKE_PROFIT",
-                side="sell" if side == "buy" else "buy",
+                "market",
+                side=opposite,
                 amount=size,
-                params={"stop_price": tp, "category": "linear"},
+                params={
+                    "triggerPrice": tp,
+                    "takeProfit": {"triggerPrice": tp},
+                    "tpSlMode": "Full",
+                    "reduceOnly": True,
+                    "closeOnTrigger": True,
+                    "category": "linear",
+                },
             )
+
+        return {"entry": entry, "stop_loss": sl_order, "take_profit": tp_order}
 
     def position_open(self) -> bool:
         """Check if there is an open position."""
