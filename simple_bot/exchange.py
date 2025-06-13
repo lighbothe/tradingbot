@@ -28,7 +28,12 @@ class Exchange:
         self.client = getattr(ccxt, id_)(params)
         if exchange_cfg.get("testnet"):
             self.client.set_sandbox_mode(True)
-        self.client.options["defaultType"] = "future"
+        self.client.options["defaultType"] = "linear"
+
+        # Ensure the configured symbol is supported by the exchange
+        markets = self.client.load_markets()
+        if self.symbol not in markets:
+            raise ValueError(f"Symbol {self.symbol} not supported by {id_}")
         leverage = cfg.get("leverage", 1)
         try:
             self.client.private_linear_post_position_leverage_save({
@@ -52,6 +57,7 @@ class Exchange:
             "time_in_force": "GoodTillCancel",
             "reduce_only": False,
             "close_on_trigger": False,
+            "category": "linear",
         }
         self.client.create_market_order(self.symbol, side, size, params=params)
         if sl:
@@ -60,7 +66,7 @@ class Exchange:
                 "STOP",
                 side="sell" if side == "buy" else "buy",
                 amount=size,
-                params={"stop_price": sl},
+                params={"stop_price": sl, "category": "linear"},
             )
         if tp:
             self.client.create_order(
@@ -68,7 +74,7 @@ class Exchange:
                 "TAKE_PROFIT",
                 side="sell" if side == "buy" else "buy",
                 amount=size,
-                params={"stop_price": tp},
+                params={"stop_price": tp, "category": "linear"},
             )
 
     def position_open(self) -> bool:
