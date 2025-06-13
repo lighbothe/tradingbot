@@ -1,0 +1,7 @@
+ccxt
+pandas
+numpy<2.0
+pandas-ta
+pyyaml
+python-dotenv
+pytest

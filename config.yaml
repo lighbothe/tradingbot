@@ -1,0 +1,23 @@
+exchange:
+  id: bybit
+  api_key: "YOUR_API_KEY"
+  secret: "YOUR_SECRET"
+  testnet: true
+  testnet_url: "https://api-testnet.bybit.com"
+  mainnet_url: "https://api.bybit.com"
+
+symbol: "BTC/USDT"
+timeframe: "1h"
+limit: 200
+leverage: 1
+indicators:
+  ema_fast: 50
+  ema_slow: 200
+  macd_fast: 12
+  macd_slow: 26
+  macd_signal: 9
+  atr_period: 14
+risk:
+  sl_atr: 1.5
+  tp_atr: 3.0
+poll_seconds: 60
