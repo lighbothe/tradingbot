@@ -14,6 +14,8 @@ pip install -r requirements.txt
 
 1. Copy `config.yaml` and edit API keys and parameters.
 2. Create `.env` if needed for additional secrets.
+3. Adjust the risk settings if desired. `risk_pct` controls the percentage of the
+   balance used per trade and `min_size` sets the minimum contract size allowed.
 
 ## Running in Testnet
 

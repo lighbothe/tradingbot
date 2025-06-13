@@ -20,4 +20,6 @@ indicators:
 risk:
   sl_atr: 1.5
   tp_atr: 3.0
+  risk_pct: 1
+  min_size: 0.001
 poll_seconds: 60

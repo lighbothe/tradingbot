@@ -7,9 +7,17 @@ import pandas as pd
 
 
 def position_size_usd(balance: float, price: float, cfg: Dict[str, float]) -> float:
-    """Calculate position size in contracts."""
-    risk_pct = cfg.get('risk_pct', 1) / 100
+    """Calculate position size in contracts.
+
+    Ensures the returned size respects the configured minimum order size.
+    Returns ``0.0`` when the calculated size is below the minimum.
+    """
+
+    risk_pct = cfg.get("risk_pct", 1) / 100
     size = (balance * risk_pct) / price
+    min_size = cfg.get("min_size", 0.001)
+    if size < min_size:
+        return 0.0
     return size
 
 

@@ -31,9 +31,22 @@ def run(cfg_path: str) -> None:
                 price = df["close"].iloc[-1]
                 balance = exchange.balance()
                 size = position_size_usd(balance, price, cfg.get("risk", {}))
-                sl, tp = calc_sl_tp(price, signal.side, df, {**cfg["indicators"], **cfg["risk"]})
-                log("INFO", f"Open {signal.side} size {size:.4f} SL {sl:.2f} TP {tp:.2f}")
-                exchange.open_position("buy" if signal.side == "LONG" else "sell", size, sl, tp)
+                if size <= 0:
+                    log("ERROR", "Position size below exchange minimum; trade skipped")
+                    continue
+                sl, tp = calc_sl_tp(
+                    price,
+                    signal.side,
+                    df,
+                    {**cfg["indicators"], **cfg["risk"]},
+                )
+                log(
+                    "INFO",
+                    f"Open {signal.side} size {size:.4f} SL {sl:.2f} TP {tp:.2f}",
+                )
+                exchange.open_position(
+                    "buy" if signal.side == "LONG" else "sell", size, sl, tp
+                )
         except Exception as err:
             log("ERROR", str(err))
         time.sleep(poll)
